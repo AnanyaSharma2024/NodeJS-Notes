@@ -1,0 +1,4 @@
+Scheme - define the structure 
+   Scheme - model
+   using model we do CRUD
+   

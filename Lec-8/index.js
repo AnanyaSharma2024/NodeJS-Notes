@@ -1,12 +1,47 @@
 const express = require('express');
 const fs = require('fs');
+const mongoose = require('mongoose');
 const users = require('./MOCK_DATA.json');
 const app = express();
 const PORT = 8000;
+
+//connecting to mongodb
+mongoose.connect("mongodb://localhost:27017/youtubeTut").then(() => {
+    console.log("connected to mongodb");
+}).catch((err) => {
+    console.log("error connecting to mongodb", err);
+});
+
+//SCHEMA
+const userSchema = new mongoose.Schema({
+    id: Number,
+    first_name: String,
+    last_name: String,
+    email: String,
+    gender: String,
+    ip_address: String
+});
+
+const User = mongoose.model('User', userSchema);
+
+
+
+
 //middleware
 //yeh middleware hai, jo har request ke sath chalta hai, aur usme se data ko parse krke req.body me store kr deta hai
-app.use(express.json());
 app.use(express.urlencoded({extended: false}));
+app.use((req, res, next) => {
+    console.log("hello from middleware");
+    req.myUserName = "ananyasharma_100"
+    next();
+});
+
+app.use((req, res, next) => {
+    console.log("hello from second middleware");
+    console.log(req.myUserName);
+    next();
+});
+
 //yeh web wla jo user use karta hai, uske liye hota hai
 app.get("/users", (req, res) => {
     const html = `
@@ -31,15 +66,28 @@ app.get("/api/users/:id", (req, res) => {
     const id = Number(req.params.id);
     //find kr rhe h 
     const user = users.find((user) => user.id === id);
+    if (!user) { return res.status(404).json({ status: "error", message: "User not found" }); } 
     return res.json(user);
 });
 
-app.post("/api/users", (req, res) => {
+app.post("/api/users", async (req, res) => {
     const body = req.body;
-    const newUser = { ...body, id: users.length + 1 };
-    users.push(newUser);
-    fs.writeFileSync("./MOCK_DATA.json", JSON.stringify(users, null, 2));
-    return res.json({ status: "success", user: newUser });
+    //validation kr do, ki body me first_name, last_name, email hai ya nahi, agar nahi hai toh 400 error return kr do
+    if(!body || !body.first_name || !body.last_name || !body.email){
+        return res.sta tus(400).json({ status: "error", message: "Invalid request body" });
+    }
+    //users array me new user ko add kr do, aur uske baad file me changes ko save kr do
+    await User.create(
+        {
+            id: users.length + 1,//id ko auto increment kr do, users array me jitne users hai uske length se 1 add kr do, toh new user ka id mil jayega
+            first_name: body.first_name,
+            last_name: body.last_name,
+            email: body.email,
+            gender: body.gender
+        });
+        console.log("result" + result);
+        //users.push({ id: users.length + 1, ...body });
+        return res.json({ status: "success", message: "User created successfully" });
 });
 
 app.patch("/api/users/:id", (req, res) => {
