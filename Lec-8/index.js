@@ -74,7 +74,7 @@ app.post("/api/users", async (req, res) => {
     const body = req.body;
     //validation kr do, ki body me first_name, last_name, email hai ya nahi, agar nahi hai toh 400 error return kr do
     if(!body || !body.first_name || !body.last_name || !body.email){
-        return res.sta tus(400).json({ status: "error", message: "Invalid request body" });
+        return res.status(400).json({ status: "error", message: "Invalid request body" });
     }
     //users array me new user ko add kr do, aur uske baad file me changes ko save kr do
     await User.create(
