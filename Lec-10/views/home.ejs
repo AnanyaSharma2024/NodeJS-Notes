@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Welcome to the URL Shortener API</h1>
+
+    <% if (error) { %>
+        <p style="color: red;"><strong><%= error %></strong></p>
+    <% } %>
+
+    <% if (createdUrl) { %>
+        <div style="margin-bottom: 1rem; padding: 1rem; border: 1px solid #ccc; background: #f9f9f9;">
+            <p><strong>URL created successfully!</strong></p>
+            <p>
+                Short URL: <a href="<%= baseUrl %>/<%= createdUrl.shortId %>" target="_blank" rel="noopener noreferrer"><%= baseUrl %>/<%= createdUrl.shortId %></a>
+            </p>
+            <p>Long URL: <a href="<%= createdUrl.redirectURL %>" target="_blank" rel="noopener noreferrer"><%= createdUrl.redirectURL %></a></p>
+        </div>
+    <% } %>
+
+    <% if (!allURLs || allURLs.length === 0) { %>
+        <p>No saved URLs yet.</p>
+    <% } else { %>
+        <ul>
+            <% allURLs.forEach(url => { %>
+                <li style="margin-bottom: 0.75rem;">
+                    <strong>Short URL:</strong>
+                    <a href="<%= baseUrl %>/<%= url.shortId %>" target="_blank" rel="noopener noreferrer"><%= baseUrl %>/<%= url.shortId %></a><br>
+                    <strong>Long URL:</strong>
+                    <a href="<%= url.redirectURL %>" target="_blank" rel="noopener noreferrer"><%= url.redirectURL %></a>
+                </li>
+            <% }) %>
+        </ul>
+    <% } %>
+
+    <div style="margin-top: 2rem;">
+        <h2>Shorten a New URL</h2>
+        <form method="POST" action="/url">
+            <input type="url" id="longUrl" name="redirectURL" placeholder="Enter long URL" required style="width: 100%; padding: 0.5rem;" />
+            <button type="submit" style="margin-top: 0.5rem; padding: 0.5rem 1rem;">Shorten</button>
+        </form>
+    </div>
+</body>
+</html> 
